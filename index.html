@@ -6521,19 +6521,30 @@ function stopAll(){ tok++; try{ speechSynthesis.cancel(); }catch(e){}
 function wait(ms,t){ return new Promise(r=>setTimeout(()=>r(t===tok),ms)); }
 function say(text,t,opts={}){ return new Promise(res=>{ if(t!==tok) return res(false);
   const u=new SpeechSynthesisUtterance(text); const v=opts.voice!==undefined?opts.voice:pickVoice();
-  if(v&&!opts.lang) try{ u.voice=v; }catch(e){} u.lang=opts.lang||(v?v.lang:(state.lang==='km'?'km-KH':'en-US')); u.rate=state.rate; u.pitch=opts.pitch||1;
-  if(opts.onb) u.onboundary=opts.onb; u.onend=()=>res(t===tok); u.onerror=()=>res(t===tok); speechSynthesis.speak(u); }); }
+  if(v) try{ u.voice=v; }catch(e){}
+  u.lang=opts.lang||(v?v.lang:(state.lang==='km'?'km-KH':'en-US'));
+  u.rate=state.rate; u.pitch=opts.pitch||1;
+  if(opts.onb) u.onboundary=opts.onb; u.onend=()=>res(t===tok); u.onerror=()=>res(t===tok);
+  try{ speechSynthesis.speak(u); }catch(e){ res(t===tok); } }); }
 function segsOf(line){ line=personal(line); const out=[]; line.split(/(‧‧‧‧‧|‧‧‧)/).forEach(p=>{ if(p==='‧‧‧') out.push(['','pause']); else if(p==='‧‧‧‧‧') out.push(['','pause-long']); else { const t=p.replace(/\[[^\]]*\]/g,'').trim(); if(t.replace(/↘/g,'').trim()) out.push([t.replace(/[↘*]/g,'').trim(), t.includes('↘')?'down':null]); } }); return out; }
 async function playSegs(btn, segs, lang){
   if(!hasTTS){ alert('Voice playback is not supported in this browser.'); return; }
   const same=activeBtn===btn; stopAll(); if(same) return;
+  const isKm = (lang==='km-KH' || state.lang==='km');
+  loadVoices();
+  const kmVoices = VOICES.filter(isKmVoice);
+  if(isKm && !kmVoices.length){
+    alert('No Khmer voice is downloaded on this device yet.\n\nTo hear Khmer speech:\n• Mac: System Settings → Accessibility → Spoken Content → Voices → search "Khmer" → download Piseth.\n• iPhone: Settings → Accessibility → Spoken Content → Voices → Khmer → Piseth.\n\nAfter downloading, reload the page to listen!');
+    return;
+  }
   const t=++tok; activeBtn=btn; btn.classList.add('playing'); btn.textContent='■ Stop';
+  const targetVoice = isKm ? (kmVoices[0] || pickVoice()) : pickVoice();
   for(const [txt,type] of segs){
     if(type==='pause'){ if(!await wait(900/state.rate,t)) return; continue; }
     if(type==='pause-long'){ if(!await wait(1900/state.rate,t)) return; continue; }
     if(type==='breath'){ if(!await wait(4000/state.rate,t)) return; continue; }
     if(type==='note'||!txt) continue;
-    if(!await say(txt.replace(/[\[\]]/g,''),t,{pitch:type==='down'?0.88:1, lang, voice:lang?null:undefined})) return;
+    if(!await say(txt.replace(/[\[\]]/g,''),t,{pitch:type==='down'?0.88:1, lang: lang||(isKm?'km-KH':'en-US'), voice: targetVoice})) return;
   }
   if(t===tok) stopAll();
 }
@@ -8027,7 +8038,8 @@ let kmObs=null, kmT=0;
 function kmWatch(){ document.documentElement.lang=state.lang==='km'?'km':'en'; if(kmObs){ kmObs.disconnect(); kmObs=null; } if(state.lang!=='km') return;
   kmPass(); kmObs=new MutationObserver(()=>{ cancelAnimationFrame(kmT); kmT=requestAnimationFrame(()=>kmPass()); }); kmObs.observe(document.body,{childList:true,subtree:true}); }
 function viewSettings(){
-  const cur=pickVoice();
+  loadVoices();
+  const cur=pickVoice(), hasKm=VOICES.some(isKmVoice);
   return `<h1 class="page-title">Settings</h1>
   <p class="sec-k">Language</p>
   <div class="card settings"><div class="src-row"><button class="small-btn${state.lang!=='km'?' on':''}" type="button" data-lang="en">English</button><button class="small-btn${state.lang==='km'?' on':''}" type="button" data-lang="km">ភាសាខ្មែរ · Khmer</button></div></div>
@@ -8037,10 +8049,11 @@ function viewSettings(){
   </div>
   <p class="sec-k">Model voice</p>
   <div class="card settings">
-    <div class="src-row"><button class="small-btn${useFiles()?' on':''}" type="button" data-src="rec">Natural</button><button class="small-btn${useFiles()?'':' on'}" type="button" data-src="device">Device voice (Premium TTS)</button></div>
+    <div class="src-row"><button class="small-btn${useFiles()?' on':''}" type="button" data-src="rec">Natural (Kokoro)</button><button class="small-btn${useFiles()?'':' on'}" type="button" data-src="device">Device voice (Premium TTS)</button></div>
+    ${state.lang==='km'&&!useFiles()&&!hasKm?`<div style="margin:12px 0 6px;padding:10px 14px;background:rgba(184,137,59,.12);border:1px solid var(--gold);border-radius:10px;font-size:0.86rem;line-height:1.5;"><strong>Khmer voice download required:</strong><br>Your Mac/iPhone doesn't have the Khmer voice downloaded yet.<br>• <strong>Mac:</strong> System Settings → Accessibility → Spoken Content → Voices → search "Khmer" → download <strong>Piseth</strong>.<br>• <strong>iPhone:</strong> Settings → Accessibility → Spoken Content → Voices → Khmer → <strong>Piseth</strong>.</div>`:''}
     ${useFiles()?'':`<label>Voice<select id="voiceSel">${VOICES.length?VOICES.slice().sort((a,b)=>rankVoice(b)-rankVoice(a)).map(v=>`<option value="${esc(v.name)}" ${cur&&v.name===cur.name?'selected':''}>${esc(v.name)} (${v.lang})</option>`).join(''):'<option>Default voice</option>'}</select></label>`}
     <div>${playBtn('id="testVoice"','▶ Test')}</div>
-    ${useFiles()?'':'<p class="hint" style="margin:0">'+(state.lang==='km'?'Better Khmer voice: phone Settings → Accessibility → Spoken Content → Voices → Khmer → Piseth (Enhanced / Premium).<br>សំឡេងខ្មែរប្រសើរជាងមុន៖ ការកំណត់លើទូរសព្ទ → ភាពងាយស្រួល → មាតិកានិយាយ → សំឡេង → ភាសាខ្មែរ (ពិសិដ្ឋ)។':'Better voices: phone Settings → Accessibility → Spoken Content → Voices → English. Download a Premium or Enhanced voice.')+'</p>'}
+    ${useFiles()?'':'<p class="hint" style="margin:0">'+(state.lang==='km'?'Khmer voice: phone Settings → Accessibility → Spoken Content → Voices → Khmer → Piseth (Enhanced / Premium).<br>សំឡេងខ្មែរ៖ ការកំណត់លើទូរសព្ទ → ភាពងាយស្រួល → មាតិកានិយាយ → សំឡេង → ភាសាខ្មែរ (ពិសិដ្ឋ)។':'Better voices: phone Settings → Accessibility → Spoken Content → Voices → English. Download a Premium or Enhanced voice.')+'</p>'}
   </div>
   <p class="sec-k">Backup</p>
   <div class="card settings">

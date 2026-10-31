@@ -5,8 +5,8 @@
      list after it loads ("save-clips"); missing clips download in the background and old versions are removed.
    - Safari plays audio with byte-range requests, so saved clips are answered with 206 partial responses.
    - Google Fonts are saved the first time they load. */
-const CORE = 'ta-core-v2', CLIPS = 'ta-clips-v1', FONTS = 'ta-fonts-v1';
-const CORE_FILES = ['./', 'index.html', 'manifest.webmanifest', 'audio/manifest.js',
+const CORE = 'ta-core-v3', CLIPS = 'ta-clips-v1', CLIPS_KM = 'ta-clips-km-v1', FONTS = 'ta-fonts-v1';
+const CORE_FILES = ['./', 'index.html', 'manifest.webmanifest', 'audio/manifest.js', 'audio/km/manifest.js',
   'icons/icon-180.png', 'icons/icon-192.png', 'icons/icon-512.png'];
 
 self.addEventListener('install', e => {
@@ -14,7 +14,7 @@ self.addEventListener('install', e => {
 });
 self.addEventListener('activate', e => {
   // Only our own old caches. Never touch others (the on-device voice model lives in "transformers-cache").
-  e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k.startsWith('ta-') && ![CORE, CLIPS, FONTS].includes(k)).map(k => caches.delete(k))))
+  e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k.startsWith('ta-') && ![CORE, CLIPS, CLIPS_KM, FONTS].includes(k)).map(k => caches.delete(k))))
     .then(() => self.clients.claim()));
 });
 
@@ -28,10 +28,11 @@ async function ranged(req, res) {
     'Content-Length': String(end - start + 1), 'Accept-Ranges': 'bytes' } });
 }
 async function clip(req) {
-  const cache = await caches.open(CLIPS), url = req.url;
+  const isKm = req.url.includes('/audio/km/');
+  const cache = await caches.open(isKm ? CLIPS_KM : CLIPS), url = req.url;
   let res = await cache.match(url);
   if (!res) {
-    res = await fetch(url);                                   // the whole file, without the Range header
+    res = await fetch(url);
     if (res.ok) await cache.put(url, res.clone());
   }
   return ranged(req, res);
@@ -53,27 +54,36 @@ async function cacheFirst(req, name) {
 self.addEventListener('fetch', e => {
   const req = e.request; if (req.method !== 'GET') return;
   const u = new URL(req.url);
-  if (u.origin === location.origin && /\/audio\/[^/]+\.m4a$/.test(u.pathname)) return e.respondWith(clip(req));
+  if (u.origin === location.origin && /\/audio\/(km\/)?[^/]+\.m4a$/.test(u.pathname)) return e.respondWith(clip(req));
   if (u.origin === location.origin) return e.respondWith(networkFirst(req));
   if (/fonts\.(googleapis|gstatic)\.com$/.test(u.hostname)) return e.respondWith(cacheFirst(req, FONTS));
 });
 
-let saving = null;
+let saving = null, savingKm = null;
 self.addEventListener('message', e => {
-  if (!e.data || e.data.type !== 'save-clips') return;
+  if (!e.data) return;
+  const isKm = e.data.type === 'save-km-clips';
+  if (e.data.type !== 'save-clips' && !isKm) return;
   const src = e.source, urls = e.data.urls.map(x => new URL(x, self.registration.scope).href);
+  const cacheName = isKm ? CLIPS_KM : CLIPS;
+  const msgType = isKm ? 'km-clips' : 'clips';
   const post = msg => { try { src && src.postMessage(msg); } catch (err) {} };
-  if (saving) { saving.then(() => post({ type: 'clips', done: urls.length, total: urls.length })); return; }
-  saving = (async () => {
-    const cache = await caches.open(CLIPS), want = new Set(urls);
-    for (const r of await cache.keys()) if (!want.has(r.url)) await cache.delete(r);   // old versions
+  
+  if (isKm && savingKm) { savingKm.then(() => post({ type: msgType, done: urls.length, total: urls.length })); return; }
+  if (!isKm && saving) { saving.then(() => post({ type: msgType, done: urls.length, total: urls.length })); return; }
+  
+  const runner = (async () => {
+    const cache = await caches.open(cacheName), want = new Set(urls);
+    for (const r of await cache.keys()) if (!want.has(r.url)) await cache.delete(r);
     const have = new Set((await cache.keys()).map(r => r.url)); let done = have.size;
-    post({ type: 'clips', done, total: urls.length });
+    post({ type: msgType, done, total: urls.length });
     const todo = urls.filter(u => !have.has(u));
-    for (let i = 0; i < todo.length; i += 6) {                 // six at a time
+    for (let i = 0; i < todo.length; i += 6) {
       await Promise.all(todo.slice(i, i + 6).map(async u => { try { const r = await fetch(u); if (r.ok) { await cache.put(u, r); done++; } } catch (err) {} }));
-      post({ type: 'clips', done, total: urls.length });
+      post({ type: msgType, done, total: urls.length });
     }
-  })().finally(() => { saving = null; });
-  e.waitUntil && e.waitUntil(saving);
+  })().finally(() => { if (isKm) savingKm = null; else saving = null; });
+  
+  if (isKm) savingKm = runner; else saving = runner;
+  e.waitUntil && e.waitUntil(runner);
 });

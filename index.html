@@ -808,6 +808,7 @@ html[lang="km"] .at-body, html[lang="km"] .ls-opt, html[lang="km"] .at-box li, h
 <header class="topbar"><div class="topbar-in"><button class="back" id="backBtn" type="button" aria-label="Back" hidden><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button><span class="top-title" id="topTitle">Trusted Agent</span><div class="top-stats" id="topStats"></div></div></header>
 <main id="main"></main>
 <script src="audio/manifest.js"></script>
+<script src="audio/km/manifest.js"></script>
 <nav class="tabbar" aria-label="Main"><div class="nav-logo">Trusted<br>Agent</div><div class="tabbar-in" id="tabbar"></div></nav>
 <script>
 /* ---------------- CONTENT ----------------
@@ -6913,17 +6914,65 @@ function segHTML(seg,li,si){ if(seg.type==='pause') return '<span class="pause">
    Each scenario line can have a recorded clip, id "s{scenario}-l{line}". The model plays, in order of preference:
    1. your own take from the Voice studio (IndexedDB, this device), 2. a file listed in AUDIO (e.g. AI voice files
    in the audio/ folder), 3. the browser's speech voice. */
-const AUDIO=window.AUDIO_FILES||{};   // from audio/manifest.js (tools/make_voice.py): "s0-l1": {url, start?, stop?}
-Object.values(AUDIO).forEach(c=>{ if(c.h&&!c.url.includes('?')) c.url+=`?v=${c.h}`; });   // a new take = a new URL, so saved copies never go stale
+const AUDIO_BASE=window.AUDIO_FILES||{};   // from audio/manifest.js (tools/make_voice.py)
+const AUDIO_KM=window.AUDIO_KM||{};       // from audio/km/manifest.js (tools/make_km_voice.py)
+Object.values(AUDIO_BASE).forEach(c=>{ if(c.h&&!c.url.includes('?')) c.url+=`?v=${c.h}`; });
+Object.values(AUDIO_KM).forEach(c=>{ if(c.h&&!c.url.includes('?')) c.url+=`?v=${c.h}`; });
+function getClip(k){
+  if(state.lang==='km'&&state.kmVoice!==false&&AUDIO_KM[k]) return AUDIO_KM[k];
+  return AUDIO_BASE[k];
+}
+const AUDIO = new Proxy(AUDIO_BASE, {
+  get(target, prop){
+    if(typeof prop==='string' && state.lang==='km' && state.kmVoice!==false && AUDIO_KM[prop]) return AUDIO_KM[prop];
+    return target[prop];
+  }
+});
 
 /* ---------------- OFFLINE ----------------
    sw.js keeps a copy of the app on the device; after the first visit every voice clip is saved in the
    background, so the app opens and plays with no signal. Settings shows the progress. */
 let OFFLINE={done:0,total:0,on:false};
+let OFFLINE_KM={done:0,total:0,on:false,saved:false};
 function offlineInit(){ if(!('serviceWorker' in navigator)||!/^https?:$/.test(location.protocol)) return;
-  navigator.serviceWorker.addEventListener('message',e=>{ if(e.data&&e.data.type==='clips'){ OFFLINE={...OFFLINE,...e.data}; const el=$('offRow'); if(el) el.innerHTML=offlineText(); } });
+  navigator.serviceWorker.addEventListener('message',e=>{
+    if(e.data&&e.data.type==='clips'){ OFFLINE={...OFFLINE,...e.data}; const el=$('offRow'); if(el) el.innerHTML=offlineText(); }
+    if(e.data&&e.data.type==='km-clips'){
+      OFFLINE_KM={...OFFLINE_KM,...e.data,saved:e.data.done>=e.data.total};
+      const el=$('kmPackStatus'); if(el) el.innerHTML=kmPackHTML();
+    }
+  });
   navigator.serviceWorker.register('sw.js').then(()=>navigator.serviceWorker.ready).then(reg=>{ OFFLINE.on=true;
-    const urls=[...new Set(Object.values(AUDIO).map(c=>c.url))]; OFFLINE.total=urls.length; reg.active&&reg.active.postMessage({type:'save-clips',urls}); }).catch(()=>{}); }
+    const urls=[...new Set(Object.values(AUDIO_BASE).map(c=>c.url))]; OFFLINE.total=urls.length; reg.active&&reg.active.postMessage({type:'save-clips',urls});
+    if(window.caches){
+      caches.open('ta-clips-km-v1').then(async c=>{
+        const keys = await c.keys(); const total = Object.keys(AUDIO_KM).length;
+        if(keys.length>=total && total>0){ OFFLINE_KM={done:keys.length,total,on:true,saved:true}; }
+        else { OFFLINE_KM.done=keys.length; OFFLINE_KM.total=total; }
+        const el=$('kmPackStatus'); if(el) el.innerHTML=kmPackHTML();
+      }).catch(()=>{});
+    }
+  }).catch(()=>{}); }
+function downloadKmPack(){
+  if(!('serviceWorker' in navigator)) return;
+  navigator.serviceWorker.ready.then(reg=>{
+    const urls=[...new Set(Object.values(AUDIO_KM).map(c=>c.url))];
+    OFFLINE_KM.total=urls.length;
+    reg.active&&reg.active.postMessage({type:'save-km-clips',urls});
+    const el=$('kmPackStatus'); if(el) el.innerHTML=`<button class="small-btn" type="button" disabled>📥 Downloading Khmer Pack… 0%</button>`;
+  });
+}
+function kmPackHTML(){
+  const o=OFFLINE_KM, total=o.total||Object.keys(AUDIO_KM).length||68;
+  if(o.saved||(o.done>=total && total>0)){
+    return `<span class="chip on" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:999px;background:var(--pri-soft);color:var(--pri);font-weight:600;font-size:0.86rem;">✓ Khmer Voice Pack Ready Offline (${total} clips)</span>`;
+  }
+  if(o.done>0 && o.done<total){
+    const pct=Math.round(o.done/total*100);
+    return `<button class="small-btn" type="button" disabled>📥 Downloading Khmer Pack… ${pct}%</button>`;
+  }
+  return `<button class="small-btn on" type="button" id="dlKmPackBtn">📥 Download Khmer Voice Pack for Offline (~2.5 MB)</button>`;
+}
 function offlineText(){ const o=OFFLINE; if(!o.on) return 'Offline copy not available in this browser.';
   if(o.total&&o.done>=o.total) return `<b>Ready offline</b> · all ${o.total} voice clips saved on this device`;
   return `Saving for offline… ${o.total?Math.round(o.done/o.total*100):0}%`; }
@@ -8039,20 +8088,30 @@ function kmWatch(){ document.documentElement.lang=state.lang==='km'?'km':'en'; i
   kmPass(); kmObs=new MutationObserver(()=>{ cancelAnimationFrame(kmT); kmT=requestAnimationFrame(()=>kmPass()); }); kmObs.observe(document.body,{childList:true,subtree:true}); }
 function viewSettings(){
   loadVoices();
-  const cur=pickVoice(), hasKm=VOICES.some(isKmVoice);
+  const cur=pickVoice();
   return `<h1 class="page-title">Settings</h1>
-  <p class="sec-k">Language</p>
+  <p class="sec-k">Language · ភាសា</p>
   <div class="card settings"><div class="src-row"><button class="small-btn${state.lang!=='km'?' on':''}" type="button" data-lang="en">English</button><button class="small-btn${state.lang==='km'?' on':''}" type="button" data-lang="km">ភាសាខ្មែរ · Khmer</button></div></div>
   <div class="card settings">
     <label>Speed <span class="rate-val" id="rateVal">${state.rate.toFixed(2)}×</span><input type="range" id="rate" min="0.6" max="1.2" step="0.05" value="${state.rate}"></label>
     <label class="toggle"><input type="checkbox" id="coachVoiceT" ${coachOn()?'checked':''}> Coach voice</label>
   </div>
+  ${state.lang==='km'?`
+  <p class="sec-k">Khmer Voice · សំឡេងខ្មែរ</p>
+  <div class="card settings">
+    <div class="src-row">
+      <button class="small-btn${state.kmVoice!==false?' on':''}" type="button" id="kmVoiceOn">Khmer Coach (ភាសាខ្មែរ)</button>
+      <button class="small-btn${state.kmVoice===false?' on':''}" type="button" id="kmVoiceOff">English Coach</button>
+    </div>
+    <div id="kmPackStatus" style="margin:12px 0;">${kmPackHTML()}</div>
+    <div>${playBtn('id="testVoice"','▶ Test Khmer Voice')}</div>
+    <p class="hint" style="margin:0">Studio-quality neural Khmer voice clips (${Object.keys(AUDIO_KM).length} clips). Works offline on all devices.</p>
+  </div>`:''}
   <p class="sec-k">Model voice</p>
   <div class="card settings">
-    <div class="src-row"><button class="small-btn${useFiles()?' on':''}" type="button" data-src="rec">Natural (Kokoro)</button><button class="small-btn${useFiles()?'':' on'}" type="button" data-src="device">Device voice</button></div>
-    ${state.lang==='km'?`<p class="hint" style="margin:8px 0 4px"><b>ស្តាប់ជាភាសាអង់គ្លេស · រៀនជាភាសាខ្មែរ</b><br>Apple (Mac/iPhone) does not have a built-in Khmer speech synthesizer. "Natural" plays the clear English audio clips while you read the lesson in Khmer — ideal for practicing international investor dialogue.</p>`:''}
+    <div class="src-row"><button class="small-btn${useFiles()?' on':''}" type="button" data-src="rec">Natural (Recorded)</button><button class="small-btn${useFiles()?'':' on'}" type="button" data-src="device">Device voice</button></div>
     ${useFiles()?'':`<label>Voice<select id="voiceSel">${VOICES.length?VOICES.slice().sort((a,b)=>rankVoice(b)-rankVoice(a)).map(v=>`<option value="${esc(v.name)}" ${cur&&v.name===cur.name?'selected':''}>${esc(v.name)} (${v.lang})</option>`).join(''):'<option>Default voice</option>'}</select></label>`}
-    <div>${playBtn('id="testVoice"','▶ Test')}</div>
+    ${state.lang!=='km'?`<div>${playBtn('id="testVoice"','▶ Test')}</div>`:''}
     ${useFiles()?'':'<p class="hint" style="margin:0">Better voices: phone Settings → Accessibility → Spoken Content → Voices → English. Download a Premium or Enhanced voice.</p>'}
   </div>
   <p class="sec-k">Backup</p>
@@ -8158,17 +8217,26 @@ function bind(n,i){
     document.querySelectorAll('.studio-sc').forEach(d=>d.addEventListener('toggle',()=>{ const si=+d.dataset.si; d.open?studioOpen.add(si):studioOpen.delete(si); }));
   }
   if(n==='settings'){
+    $('kmVoiceOn')?.addEventListener('click',()=>{ state.kmVoice=true; save(); render(); });
+    $('kmVoiceOff')?.addEventListener('click',()=>{ state.kmVoice=false; save(); render(); });
+    $('dlKmPackBtn')?.addEventListener('click',()=>downloadKmPack());
     $('voiceSel')?.addEventListener('change',e=>{ state.voice=e.target.value; save(); });
     $('coachVoiceT').addEventListener('change',e=>{ state.coachVoice=e.target.checked; save(); });
     $('rate').addEventListener('input',e=>{ state.rate=+e.target.value; $('rateVal').textContent=state.rate.toFixed(2)+'×'; save(); });
-    $('testVoice').addEventListener('click',e=>{
+    $('testVoice')?.addEventListener('click',e=>{
       const b=e.currentTarget;
+      if(state.lang==='km' && state.kmVoice!==false){
+        const c=AUDIO_KM['test-km']||AUDIO_KM['at0-t0']||AUDIO_KM['c-fx-good'];
+        if(c) return runBtn(b,t=>playClip(c,[],t));
+      }
       if(useFiles()){
         const c=AUDIO['at0-t0'];
         if(c) runBtn(b,t=>playClip(c,[],t));
         else playSegs(b, segsOf('Good to meet you. ‧‧‧ Thank you for your time. ↘'));
       } else {
         if(state.lang==='km'){
+          const c=AUDIO_KM['test-km']||AUDIO_KM['at0-t0'];
+          if(c) return runBtn(b,t=>playClip(c,[],t));
           playSegs(b, segsOf('រីករាយដែលបានជួបលោកអ្នក។ ‧‧‧ ខ្ញុំជាទីប្រឹក្សាអចលនទ្រព្យអាជីព។ ↘'), 'km-KH');
         } else {
           playSegs(b, segsOf('Good to meet you. ‧‧‧ Thank you for your time. ↘'), 'en-US');

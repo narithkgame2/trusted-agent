@@ -7013,7 +7013,8 @@ function playClip(c,spans,t){ return new Promise(async res=>{ if(t!==tok) return
     if(t1>t0){ const p=(env&&at(t1)>at(t0)?Math.max(0,(at(a.currentTime)-at(t0))/(at(t1)-at(t0))):Math.max(0,(a.currentTime-t0)/(t1-t0)))*tot; let acc=0, hit=null; for(let i=0;i<spans.length;i++){ acc+=w[i]; if(p<=acc){ hit=spans[i]; break; } } spans.forEach(s=>s.classList.toggle('on',s===hit)); }
     raf=requestAnimationFrame(tick); };
   a.onended=()=>end(true); a.onerror=()=>end(false);
-  a.onloadedmetadata=()=>{ if(c.start) a.currentTime=c.start; a.play().then(()=>{ raf=requestAnimationFrame(tick); }).catch(()=>end(false)); };
+  const start=()=>{ if(c.start) a.currentTime=c.start; a.play().then(()=>{ raf=requestAnimationFrame(tick); }).catch(()=>end(false)); };
+  if(a.readyState>=1) start(); else a.onloadedmetadata=start;
 }); }
 
 /* ---------------- COACH VOICE ----------------
@@ -7056,11 +7057,11 @@ function coachText(k){ let m;
   if((m=k.match(/^c-lesson(\d+)-drill$/))){ const l=LESSONS[+m[1]]; return plainText(`${l.drill.tag} ${l.drill.note}`); }
   return ''; }
 const coachOn=()=>state.coachVoice!==false;
-const useFiles=()=>state.voiceSrc!=='device';   // Settings → Model voice: Recorded files, or this device's own voice
+const useFiles=()=>(state.lang==='km'?true:(state.voiceSrc!=='device'));   // Settings → Model voice: Recorded files, or this device's own voice
 function coachSay(k,t){
-  if(state.lang==='km'&&!useFiles()){
-    const raw=coachText(k); const txt=KM[raw]||kmText(raw)||raw;
-    return txt&&hasTTS?say(txt,t,{voice:pickVoice(),lang:'km-KH'}):Promise.resolve(true);
+  if(state.lang==='km'&&state.kmVoice!==false){
+    const c=AUDIO_KM[k]||AUDIO_BASE[k];
+    if(c) return playClip(c,[],t);
   }
   const c=useFiles()&&AUDIO[k]; if(c) return playClip(c,[],t); const raw=coachText(k);
   const txt=state.lang==='km'?(KM[raw]||kmText(raw)||raw):raw;
@@ -7643,7 +7644,9 @@ const quizText=t=>{ t=personal(t); const act=(t.match(/\[([^\]]*)\]/g)||[]).map(
     +(said?`<span class="q-say"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg><span>“${esc(said)}”</span></span>`:''); };
 function lessonAct(a,btn){
   if(a==='nextup') return nextUp();
-  if(a==='ls-start') return startLesson(+btn.dataset.i);
+  if(a==='ls-start'){ unlockAudio(); return startLesson(+btn.dataset.i); }
+  if(a==='ls-intro-read') return runBtn(btn, t=>coachSay(`c-at${lsess.i}-intro`, t));
+  if(a==='ls-sec-read') return runBtn(btn, t=>readParts(t, lsess.i, lsess.cards[lsess.n].k));
   if(!lsess) return;
   const c=lsess.cards[lsess.n], P=lsess.kind==='lesson'?LESSONS[lsess.i].practice:null;
   if(a==='ls-exit'){ const f=lsess.from; endLesson(); return go(f); }
@@ -7753,10 +7756,11 @@ function viewLessonSession(){
       ft=`<div class="res" role="status"><span class="res-ic">${c.ok?ICO.check:ICO.warn}</span><div><div class="res-t">${c.ok?'Right':'Not quite'}</div><p class="fb-tip">${esc(p.why)}</p></div></div>${cont()}`; } }
   else if(c.type==='intro'){
     body=`${l.door?`<div class="at-pic">${atSVG('door','The office door')}</div>`:`<div class="ls-ico">${LICO[i]}</div>`}<p class="eyebrow">Step ${stepNo('lesson',i)} · ${esc(l.unit)}</p><h1 class="fx-title">${esc(l.title)}</h1>
+      <div class="q-listen" style="margin:12px 0 6px"><button class="small-btn coach-btn" type="button" data-act="ls-intro-read">▶ Listen</button></div>
       <p class="ctx" style="margin-top:14px">You'll learn</p><ul class="at-objs">${l.objectives.map(o=>`<li>${esc(o)}</li>`).join('')}</ul>`;
     ft=cont('Start'); }
   else if(c.type==='sec'){ const x=l.sections[c.k];
-    body=`<p class="ctx">${esc(x.label)}</p><h1 class="fx-title">${esc(x.heading)}</h1>${atPhoto(x.photo)}<div class="at-body">${x.short?esc(x.short):x.body}</div>${atExtras(x,x.flow?'flow':undefined)}`;
+    body=`<p class="ctx">${esc(x.label)}</p><h1 class="fx-title">${esc(x.heading)}</h1><div class="q-listen" style="margin:8px 0 4px"><button class="small-btn coach-btn" type="button" data-act="ls-sec-read">▶ Listen</button></div>${atPhoto(x.photo)}<div class="at-body">${x.short?esc(x.short):x.body}</div>${atExtras(x,x.flow?'flow':undefined)}`;
     ft=cont(); }
   else if(c.type==='step'){ const x=l.sections[c.k];
     body=`<p class="ctx">${esc(x.label)} · Step ${c.j+1} of ${x.flow.length}</p><h1 class="fx-title">${esc(x.heading)}</h1>

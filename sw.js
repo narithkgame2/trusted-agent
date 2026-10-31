@@ -5,7 +5,7 @@
      list after it loads ("save-clips"); missing clips download in the background and old versions are removed.
    - Safari plays audio with byte-range requests, so saved clips are answered with 206 partial responses.
    - Google Fonts are saved the first time they load. */
-const CORE = 'ta-core-v3', CLIPS = 'ta-clips-v1', CLIPS_KM = 'ta-clips-km-v1', FONTS = 'ta-fonts-v1';
+const CORE = 'ta-core-v4', CLIPS = 'ta-clips-v1', CLIPS_KM = 'ta-clips-km-v1', FONTS = 'ta-fonts-v1';
 const CORE_FILES = ['./', 'index.html', 'manifest.webmanifest', 'audio/manifest.js', 'audio/km/manifest.js',
   'icons/icon-180.png', 'icons/icon-192.png', 'icons/icon-512.png'];
 

@@ -106,6 +106,29 @@ def collect_km_jobs():
                     step_text = f"ជំហានទី {j+1}៖ {ft_km}។ {fs_km}"
                     jobs.append((f"c-at{i}-s{k}-f{j}", COACH_KM, clean_km(step_text)))
                     
+            # Extra units (data, box, analogy)
+            x_count = 0
+            if x.get("analogy"):
+                an = KM.get(x["analogy"], x["analogy"])
+                jobs.append((f"c-at{i}-s{k}-x{x_count}", COACH_KM, clean_km(f"សូមគិតបែបនេះ៖ {an}")))
+                x_count += 1
+            if x.get("box"):
+                for line in x["box"]["lines"]:
+                    jobs.append((f"c-at{i}-s{k}-x{x_count}", COACH_KM, clean_km(KM.get(line, line))))
+                    x_count += 1
+            if x.get("data"):
+                for d in x["data"]:
+                    jobs.append((f"c-at{i}-s{k}-x{x_count}", COACH_KM, clean_km(KM.get(d, d))))
+                    x_count += 1
+
+            # Rules
+            for j, r in enumerate(x.get("rules", [])):
+                rt = KM.get(r.get("title", ""), r.get("title", ""))
+                rd = KM.get(r.get("detail", ""), r.get("detail", ""))
+                ra = KM.get(r.get("action", ""), r.get("action", ""))
+                rule_text = f"{rt}។ {rd}" + (f" ធ្វើដូច្នេះ៖ {ra}" if ra else "")
+                jobs.append((f"c-at{i}-s{k}-r{j}", COACH_KM, clean_km(rule_text)))
+
         # Quiz
         for k, q in enumerate(l.get("quiz", [])):
             prompt = q.get("prompt") or q.get("q") or ""

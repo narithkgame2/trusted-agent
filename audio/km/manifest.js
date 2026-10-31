@@ -188,47 +188,47 @@ window.AUDIO_KM = {
   "c-at1-intro": {
     "url": "audio/km/c-at1-intro.m4a",
     "voice": "km-KH-PisethNeural",
-    "h": "570998bd31c4"
+    "h": "5698b4ac9b7d"
   },
   "c-at2-intro": {
     "url": "audio/km/c-at2-intro.m4a",
     "voice": "km-KH-PisethNeural",
-    "h": "95e5baa8a2f6"
+    "h": "c5674716ea9e"
   },
   "c-at3-intro": {
     "url": "audio/km/c-at3-intro.m4a",
     "voice": "km-KH-PisethNeural",
-    "h": "756f5c74e245"
+    "h": "6e0be643f530"
   },
   "c-at4-intro": {
     "url": "audio/km/c-at4-intro.m4a",
     "voice": "km-KH-PisethNeural",
-    "h": "a05ba3c8c785"
+    "h": "3086f2e59ab5"
   },
   "c-at5-intro": {
     "url": "audio/km/c-at5-intro.m4a",
     "voice": "km-KH-PisethNeural",
-    "h": "d95fee7b80a2"
+    "h": "76d3221e4f04"
   },
   "c-at6-intro": {
     "url": "audio/km/c-at6-intro.m4a",
     "voice": "km-KH-PisethNeural",
-    "h": "ed04f2a483fd"
+    "h": "7615b5ace9e2"
   },
   "c-at7-intro": {
     "url": "audio/km/c-at7-intro.m4a",
     "voice": "km-KH-PisethNeural",
-    "h": "a9e882964896"
+    "h": "cbbbc83a7d50"
   },
   "c-at8-intro": {
     "url": "audio/km/c-at8-intro.m4a",
     "voice": "km-KH-PisethNeural",
-    "h": "44702c80f988"
+    "h": "8f7f6ac0af12"
   },
   "c-at9-intro": {
     "url": "audio/km/c-at9-intro.m4a",
     "voice": "km-KH-PisethNeural",
-    "h": "a9e6de369add"
+    "h": "61603dd20ade"
   },
   "c-at16-intro": {
     "url": "audio/km/c-at16-intro.m4a",
@@ -423,7 +423,7 @@ window.AUDIO_KM = {
   "c-at1-s2-r0": {
     "url": "audio/km/c-at1-s2-r0.m4a",
     "voice": "km-KH-PisethNeural",
-    "h": "ca249a2a2e56"
+    "h": "5fd4478d6252"
   },
   "c-at2-s0-x0": {
     "url": "audio/km/c-at2-s0-x0.m4a",
@@ -448,47 +448,47 @@ window.AUDIO_KM = {
   "c-at2-s1-r0": {
     "url": "audio/km/c-at2-s1-r0.m4a",
     "voice": "km-KH-PisethNeural",
-    "h": "8d76cb7525e3"
+    "h": "43261b84461d"
   },
   "c-at2-s1-r1": {
     "url": "audio/km/c-at2-s1-r1.m4a",
     "voice": "km-KH-PisethNeural",
-    "h": "3cffbe1ea24c"
+    "h": "e9e203cf89a3"
   },
   "c-at2-s1-r2": {
     "url": "audio/km/c-at2-s1-r2.m4a",
     "voice": "km-KH-PisethNeural",
-    "h": "d8b7cb6922e9"
+    "h": "f089ee0adec7"
   },
   "c-at2-s2-r0": {
     "url": "audio/km/c-at2-s2-r0.m4a",
     "voice": "km-KH-PisethNeural",
-    "h": "a138956f935e"
+    "h": "4b820da0e599"
   },
   "c-at2-s2-r1": {
     "url": "audio/km/c-at2-s2-r1.m4a",
     "voice": "km-KH-PisethNeural",
-    "h": "365e434c2ddc"
+    "h": "3595a84093b0"
   },
   "c-at2-s2-r2": {
     "url": "audio/km/c-at2-s2-r2.m4a",
     "voice": "km-KH-PisethNeural",
-    "h": "27a6c44566b7"
+    "h": "9140420ff6a7"
   },
   "c-at2-s2-r3": {
     "url": "audio/km/c-at2-s2-r3.m4a",
     "voice": "km-KH-PisethNeural",
-    "h": "c716f56fd28c"
+    "h": "1caa7449d951"
   },
   "c-at2-s2-r4": {
     "url": "audio/km/c-at2-s2-r4.m4a",
     "voice": "km-KH-PisethNeural",
-    "h": "77e0a582248a"
+    "h": "6b49bc7a61b1"
   },
   "c-at2-s2-r5": {
     "url": "audio/km/c-at2-s2-r5.m4a",
     "voice": "km-KH-PisethNeural",
-    "h": "9e3ea93360fe"
+    "h": "c7eac323cf27"
   },
   "c-at3-s0-x0": {
     "url": "audio/km/c-at3-s0-x0.m4a",
@@ -498,57 +498,57 @@ window.AUDIO_KM = {
   "c-at3-s2-r0": {
     "url": "audio/km/c-at3-s2-r0.m4a",
     "voice": "km-KH-PisethNeural",
-    "h": "d584aca68388"
+    "h": "f13c0b98611f"
   },
   "c-at3-s2-r1": {
     "url": "audio/km/c-at3-s2-r1.m4a",
     "voice": "km-KH-PisethNeural",
-    "h": "03eddd6f13ff"
+    "h": "b3b89d2cc0e0"
   },
   "c-at3-s2-r2": {
     "url": "audio/km/c-at3-s2-r2.m4a",
     "voice": "km-KH-PisethNeural",
-    "h": "7a0c8e2c41d0"
+    "h": "f250ebe98ebd"
   },
   "c-at4-s0-r0": {
     "url": "audio/km/c-at4-s0-r0.m4a",
     "voice": "km-KH-PisethNeural",
-    "h": "ac4d8b25831d"
+    "h": "3582bcbd7f15"
   },
   "c-at4-s1-r0": {
     "url": "audio/km/c-at4-s1-r0.m4a",
     "voice": "km-KH-PisethNeural",
-    "h": "748e2b31a698"
+    "h": "43387d5e19f7"
   },
   "c-at5-s0-r0": {
     "url": "audio/km/c-at5-s0-r0.m4a",
     "voice": "km-KH-PisethNeural",
-    "h": "78a093bab6aa"
+    "h": "0e8e02f28a4e"
   },
   "c-at5-s1-r0": {
     "url": "audio/km/c-at5-s1-r0.m4a",
     "voice": "km-KH-PisethNeural",
-    "h": "90a2fddcc4b1"
+    "h": "42cc55d003fd"
   },
   "c-at6-s0-r0": {
     "url": "audio/km/c-at6-s0-r0.m4a",
     "voice": "km-KH-PisethNeural",
-    "h": "f54f941a65a5"
+    "h": "29c9a367fcf5"
   },
   "c-at7-s0-r0": {
     "url": "audio/km/c-at7-s0-r0.m4a",
     "voice": "km-KH-PisethNeural",
-    "h": "e10633884dcf"
+    "h": "385562050ed5"
   },
   "c-at8-s0-r0": {
     "url": "audio/km/c-at8-s0-r0.m4a",
     "voice": "km-KH-PisethNeural",
-    "h": "9d1a70811d34"
+    "h": "c398f8e51245"
   },
   "c-at9-s0-r0": {
     "url": "audio/km/c-at9-s0-r0.m4a",
     "voice": "km-KH-PisethNeural",
-    "h": "aa444e2be527"
+    "h": "8e7dc4658fff"
   },
   "c-at16-s1-r0": {
     "url": "audio/km/c-at16-s1-r0.m4a",
@@ -1154,5 +1154,145 @@ window.AUDIO_KM = {
     "url": "audio/km/c-at36-s2-r0.m4a",
     "voice": "km-KH-PisethNeural",
     "h": "1da9c70b323f"
+  },
+  "c-at1-s0": {
+    "url": "audio/km/c-at1-s0.m4a",
+    "voice": "km-KH-PisethNeural",
+    "h": "6aabfc116c0e"
+  },
+  "c-at1-s1": {
+    "url": "audio/km/c-at1-s1.m4a",
+    "voice": "km-KH-PisethNeural",
+    "h": "c4c04506634b"
+  },
+  "c-at1-s2": {
+    "url": "audio/km/c-at1-s2.m4a",
+    "voice": "km-KH-PisethNeural",
+    "h": "4118e51860a3"
+  },
+  "c-at1-s3": {
+    "url": "audio/km/c-at1-s3.m4a",
+    "voice": "km-KH-PisethNeural",
+    "h": "94c1a2589a1f"
+  },
+  "c-at2-s0": {
+    "url": "audio/km/c-at2-s0.m4a",
+    "voice": "km-KH-PisethNeural",
+    "h": "e592c2d7a4e9"
+  },
+  "c-at2-s1": {
+    "url": "audio/km/c-at2-s1.m4a",
+    "voice": "km-KH-PisethNeural",
+    "h": "79e4c086f73b"
+  },
+  "c-at2-s2": {
+    "url": "audio/km/c-at2-s2.m4a",
+    "voice": "km-KH-PisethNeural",
+    "h": "dc3a3f5ec583"
+  },
+  "c-at2-s2-f0": {
+    "url": "audio/km/c-at2-s2-f0.m4a",
+    "voice": "km-KH-PisethNeural",
+    "h": "c381e44f9960"
+  },
+  "c-at2-s2-f1": {
+    "url": "audio/km/c-at2-s2-f1.m4a",
+    "voice": "km-KH-PisethNeural",
+    "h": "d32047d57301"
+  },
+  "c-at2-s2-f2": {
+    "url": "audio/km/c-at2-s2-f2.m4a",
+    "voice": "km-KH-PisethNeural",
+    "h": "f3a5d4343e3b"
+  },
+  "c-at2-s2-f3": {
+    "url": "audio/km/c-at2-s2-f3.m4a",
+    "voice": "km-KH-PisethNeural",
+    "h": "b6000b7d259e"
+  },
+  "c-at2-s2-f4": {
+    "url": "audio/km/c-at2-s2-f4.m4a",
+    "voice": "km-KH-PisethNeural",
+    "h": "ffd2d3fbe369"
+  },
+  "c-at2-s2-f5": {
+    "url": "audio/km/c-at2-s2-f5.m4a",
+    "voice": "km-KH-PisethNeural",
+    "h": "34355c56176e"
+  },
+  "c-at3-s0": {
+    "url": "audio/km/c-at3-s0.m4a",
+    "voice": "km-KH-PisethNeural",
+    "h": "0de669e94bb2"
+  },
+  "c-at3-s1": {
+    "url": "audio/km/c-at3-s1.m4a",
+    "voice": "km-KH-PisethNeural",
+    "h": "5a67a0adc862"
+  },
+  "c-at3-s2": {
+    "url": "audio/km/c-at3-s2.m4a",
+    "voice": "km-KH-PisethNeural",
+    "h": "6dae24a90d1d"
+  },
+  "c-at3-s2-f0": {
+    "url": "audio/km/c-at3-s2-f0.m4a",
+    "voice": "km-KH-PisethNeural",
+    "h": "8be669f646d6"
+  },
+  "c-at3-s2-f1": {
+    "url": "audio/km/c-at3-s2-f1.m4a",
+    "voice": "km-KH-PisethNeural",
+    "h": "1543c057cbbd"
+  },
+  "c-at3-s2-f2": {
+    "url": "audio/km/c-at3-s2-f2.m4a",
+    "voice": "km-KH-PisethNeural",
+    "h": "907e5d00c5e5"
+  },
+  "c-at4-s0": {
+    "url": "audio/km/c-at4-s0.m4a",
+    "voice": "km-KH-PisethNeural",
+    "h": "4d019e1ee055"
+  },
+  "c-at4-s1": {
+    "url": "audio/km/c-at4-s1.m4a",
+    "voice": "km-KH-PisethNeural",
+    "h": "aa360a6eeae4"
+  },
+  "c-at5-s0": {
+    "url": "audio/km/c-at5-s0.m4a",
+    "voice": "km-KH-PisethNeural",
+    "h": "287eedbacc28"
+  },
+  "c-at5-s1": {
+    "url": "audio/km/c-at5-s1.m4a",
+    "voice": "km-KH-PisethNeural",
+    "h": "7c69bbda7c35"
+  },
+  "c-at6-s0": {
+    "url": "audio/km/c-at6-s0.m4a",
+    "voice": "km-KH-PisethNeural",
+    "h": "cc7c56f534de"
+  },
+  "c-at7-s0": {
+    "url": "audio/km/c-at7-s0.m4a",
+    "voice": "km-KH-PisethNeural",
+    "h": "54a97dec3619"
+  },
+  "c-at8-s0": {
+    "url": "audio/km/c-at8-s0.m4a",
+    "voice": "km-KH-PisethNeural",
+    "h": "7072753bf5a7"
+  },
+  "c-at9-s0": {
+    "url": "audio/km/c-at9-s0.m4a",
+    "voice": "km-KH-PisethNeural",
+    "h": "678ae0097565"
+  },
+  "c-at34-s0-f1": {
+    "url": "audio/km/c-at34-s0-f1.m4a",
+    "voice": "km-KH-PisethNeural",
+    "h": "0b6089f085e1"
   }
 };

@@ -8049,11 +8049,11 @@ function viewSettings(){
   </div>
   <p class="sec-k">Model voice</p>
   <div class="card settings">
-    <div class="src-row"><button class="small-btn${useFiles()?' on':''}" type="button" data-src="rec">Natural (Kokoro)</button><button class="small-btn${useFiles()?'':' on'}" type="button" data-src="device">Device voice (Premium TTS)</button></div>
-    ${state.lang==='km'&&!useFiles()&&!hasKm?`<div style="margin:12px 0 6px;padding:10px 14px;background:rgba(184,137,59,.12);border:1px solid var(--gold);border-radius:10px;font-size:0.86rem;line-height:1.5;"><strong>Khmer voice download required:</strong><br>Your Mac/iPhone doesn't have the Khmer voice downloaded yet.<br>• <strong>Mac:</strong> System Settings → Accessibility → Spoken Content → Voices → search "Khmer" → download <strong>Piseth</strong>.<br>• <strong>iPhone:</strong> Settings → Accessibility → Spoken Content → Voices → Khmer → <strong>Piseth</strong>.</div>`:''}
+    <div class="src-row"><button class="small-btn${useFiles()?' on':''}" type="button" data-src="rec">Natural (Kokoro)</button><button class="small-btn${useFiles()?'':' on'}" type="button" data-src="device">Device voice</button></div>
+    ${state.lang==='km'?`<p class="hint" style="margin:8px 0 4px"><b>ស្តាប់ជាភាសាអង់គ្លេស · រៀនជាភាសាខ្មែរ</b><br>Apple (Mac/iPhone) does not have a built-in Khmer speech synthesizer. "Natural" plays the clear English audio clips while you read the lesson in Khmer — ideal for practicing international investor dialogue.</p>`:''}
     ${useFiles()?'':`<label>Voice<select id="voiceSel">${VOICES.length?VOICES.slice().sort((a,b)=>rankVoice(b)-rankVoice(a)).map(v=>`<option value="${esc(v.name)}" ${cur&&v.name===cur.name?'selected':''}>${esc(v.name)} (${v.lang})</option>`).join(''):'<option>Default voice</option>'}</select></label>`}
     <div>${playBtn('id="testVoice"','▶ Test')}</div>
-    ${useFiles()?'':'<p class="hint" style="margin:0">'+(state.lang==='km'?'Khmer voice: phone Settings → Accessibility → Spoken Content → Voices → Khmer → Piseth (Enhanced / Premium).<br>សំឡេងខ្មែរ៖ ការកំណត់លើទូរសព្ទ → ភាពងាយស្រួល → មាតិកានិយាយ → សំឡេង → ភាសាខ្មែរ (ពិសិដ្ឋ)។':'Better voices: phone Settings → Accessibility → Spoken Content → Voices → English. Download a Premium or Enhanced voice.')+'</p>'}
+    ${useFiles()?'':'<p class="hint" style="margin:0">Better voices: phone Settings → Accessibility → Spoken Content → Voices → English. Download a Premium or Enhanced voice.</p>'}
   </div>
   <p class="sec-k">Backup</p>
   <div class="card settings">
